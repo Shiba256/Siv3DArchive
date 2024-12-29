@@ -4,16 +4,16 @@
 
 namespace Archive {
 	ArchiveDetail::ArchiveDetail(AES::Key key, AES::Mode mode) :
-			aes_key(key),
-			aes_iv(GenerateIV()),
-			aes_manager(aes_key, mode)
+			m_aes_key(key),
+			m_aes_iv(GenerateIV()),
+			m_aes_manager(m_aes_key, mode)
 		{}
 
 	void ArchiveDetail::Create(FilePathView path) const{
-			Serializer<BinaryWriter> writer{ archive_path };
+			Serializer<BinaryWriter> writer{ m_archive_path };
 			const auto directory_contents = FileSystem::DirectoryContents(path);
 			writer << directory_contents.filter(FileSystem::IsFile).size();
-			writer->write(aes_iv.data(), aes_iv.size_bytes());
+			writer->write(m_aes_iv.data(), m_aes_iv.size_bytes());
 			for (const auto& content : directory_contents) {
 				const auto content_path = FileSystem::RelativePath(content);
 				if (FileSystem::IsFile(content_path)) {
@@ -27,8 +27,8 @@ namespace Archive {
 					}
 					Blob content_path_blob{ content_path.data(),content_path.size_bytes() };
 					Blob file_size_blob{ &file_size,sizeof(file_size) };
-					const auto encrypted_content_path = aes_manager.encrypt(content_path_blob, aes_iv);
-					const auto encrypted_file_size = aes_manager.encrypt(file_size_blob, aes_iv);
+					const auto encrypted_content_path = m_aes_manager.encrypt(content_path_blob, m_aes_iv);
+					const auto encrypted_file_size = m_aes_manager.encrypt(file_size_blob, m_aes_iv);
 					writer << encrypted_content_path.base64() << encrypted_file_size.base64();
 				}
 			}
@@ -44,7 +44,7 @@ namespace Archive {
 		}
 
 	void ArchiveDetail::ReadHeader() {
-			Deserializer<BinaryReader> reader{ archive_path };
+			Deserializer<BinaryReader> reader{ m_archive_path };
 			size_t directory_size = 0ull;
 			reader >> directory_size;
 			AES::IV iv;
@@ -58,44 +58,44 @@ namespace Archive {
 				constexpr size_t size_of_String_value_type{ sizeof(String::value_type) };
 
 				Blob name_blob = Base64::Decode(name_base64);
-				const auto decrypted_name = aes_manager.decrypt(name_blob, iv);
+				const auto decrypted_name = m_aes_manager.decrypt(name_blob, iv);
 				size_t name_size = decrypted_name.size() / size_of_String_value_type;
 				String name{ U"",name_size };
 				std::memcpy(name.data(), decrypted_name.data(), decrypted_name.size_bytes());
 
 				Blob size_blob = Base64::Decode(size_base64);
-				const auto decrypted_size = aes_manager.decrypt(size_blob, iv);
+				const auto decrypted_size = m_aes_manager.decrypt(size_blob, iv);
 				size_t size = 0ull;
 				std::memcpy(&size, decrypted_size.data(), decrypted_size.size_bytes());
 #ifdef _ARCHIVE_DEBUG_
 				Console << U"ReadHeader " << name;
 #endif // _ARCHIVE_DEBUG_
-				data.emplace(name, std::pair{ binary_pos ,size });
+				m_data.emplace(name, std::pair{ binary_pos ,size });
 				binary_pos += size;
 			}
-			header_size = reader->getPos();
+			m_header_size = reader->getPos();
 		}
 
 	MemoryReader ArchiveDetail::Load(FilePathView path) const {
-			if (data.contains(path)) {
-				BinaryReader reader{ archive_path };
-				reader.setPos(header_size + data.at(path).first);
-				Array<Byte> bytes;
-				for ([[maybe_unused]] const auto& i : step(data.at(path).second)) {
-					Byte byte{};
-					reader.read(&byte, sizeof(Byte));
-					bytes << byte;
-				}
-				return MemoryReader{ Decrypt(bytes) };
+		if (m_data.contains(path)) {
+			BinaryReader reader{ m_archive_path };
+			reader.setPos(m_header_size + m_data.at(path).first);
+			Array<Byte> bytes;
+			for ([[maybe_unused]] const auto& i : step(m_data.at(path).second)) {
+				Byte byte{};
+				reader.read(&byte, sizeof(Byte));
+				bytes << byte;
 			}
-			else {
-				return MemoryReader{};
-			}
+			return MemoryReader{ Decrypt(bytes) };
 		}
+		else {
+			return MemoryReader{};
+		}
+	}
 
 	void ArchiveDetail::setArchivePath(FilePathView path) {
-			archive_path = path;
-		}
+		m_archive_path = path;
+	}
 
 	Blob ArchiveDetail::Encrypt(FilePathView before) const {
 			BinaryReader reader{ before };
@@ -105,11 +105,11 @@ namespace Archive {
 				plain.append(&reader_byte, sizeof(reader_byte));
 			}
 			AES::IV iv = GenerateIV();
-			Blob encrypted = aes_manager.encrypt(plain, iv);
+			Blob encrypted = m_aes_manager.encrypt(plain, iv);
 			size_t i = 0ull;
 			for (auto& byte : iv) {
-				if (i == aes_key.size())i = 0;
-				byte ^= aes_key[i++];
+				if (i == m_aes_key.size())i = 0;
+				byte ^= m_aes_key[i++];
 			}
 			for (const auto& byte : iv) {
 				encrypted.append(&byte, sizeof(byte));
@@ -126,14 +126,14 @@ namespace Archive {
 			}
 			i = 0ull;
 			for (auto& byte : iv) {
-				if (i == aes_key.size())i = 0;
-				byte ^= aes_key[i++];
+				if (i == m_aes_key.size())i = 0;
+				byte ^= m_aes_key[i++];
 			}
 			Blob encrypted;
 			for (auto itr = bytes.begin(); itr != bytes.end() - AES::BLOCK_SIZE; ++itr) {
 				encrypted.append(&(*itr), sizeof(*itr));
 			}
-			return aes_manager.decrypt(encrypted, iv);
+			return m_aes_manager.decrypt(encrypted, iv);
 		}
 
 	AES::IV ArchiveDetail::GenerateIV() const {

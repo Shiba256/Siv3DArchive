@@ -20,15 +20,15 @@ namespace Archive {
 		void setArchivePath(FilePathView path);
 
 		constexpr bool isRead() const noexcept {
-			return static_cast<bool>(header_size);
+			return static_cast<bool>(m_header_size);
 		}
 	private:
-		HashTable<FilePath, std::pair<size_t, size_t>> data;
-		size_t header_size = 0ull;
-		FilePathView archive_path = U"";
-		AES::Key aes_key;
-		AES::IV aes_iv;
-		AES::Manager aes_manager;
+		HashTable<FilePath, std::pair<size_t, size_t>> m_data;
+		size_t m_header_size = 0ull;
+		FilePathView m_archive_path = U"";
+		AES::Key m_aes_key;
+		AES::IV m_aes_iv;
+		AES::Manager m_aes_manager;
 
 		Blob Encrypt(FilePathView before) const;
 
