@@ -22,7 +22,8 @@ namespace Archive {
 		size_t header_pos = META_DATA_SIZE;
 		for (const auto& content : directory_contents) {
 			const auto content_path = FileSystem::RelativePath(content);
-			const auto encrypt_binary = Encrypt(content_path);
+			Blob blob{ content_path };
+			const auto encrypt_binary = Encrypt(blob);
 			const auto cmp_encrypt_binary = Compression::Compress(encrypt_binary, Compression::MaxLevel);
 			writer->write(cmp_encrypt_binary.data(), cmp_encrypt_binary.size_bytes());
 			header_data << std::pair{ content_path, cmp_encrypt_binary.size_bytes() };
@@ -89,8 +90,7 @@ namespace Archive {
 				reader.read(&byte, sizeof(Byte));
 				bytes.append(&byte, sizeof(Byte));
 			}
-			const auto decmp_bytes_array = Compression::Decompress(bytes).asArray();
-			return MemoryReader{ Decrypt(decmp_bytes_array) };
+			return MemoryReader{ Decrypt(Compression::Decompress(bytes)) };
 		}
 		else {
 			return MemoryReader{};
@@ -101,13 +101,7 @@ namespace Archive {
 		m_archive_path = path;
 	}
 
-	Blob ArchiveDetail::Encrypt(FilePathView before) const {
-			BinaryReader reader{ before };
-			Blob plain;
-			Byte reader_byte;
-			while (reader.read(&reader_byte, sizeof(reader_byte))) {
-				plain.append(&reader_byte, sizeof(reader_byte));
-			}
+	Blob ArchiveDetail::Encrypt(const Blob& plain) const {
 			AES::IV iv = GenerateIV();
 			Blob encrypted = m_aes_manager.encrypt(plain, iv);
 			size_t i = 0ull;
@@ -121,7 +115,7 @@ namespace Archive {
 			return encrypted;
 		}
 
-	Blob ArchiveDetail::Decrypt(const Array<Byte>& bytes) const {
+	Blob ArchiveDetail::Decrypt(const Blob& bytes) const {
 		AES::IV iv;
 		size_t i = 0ull;
 		for (auto itr = bytes.end() - AES::BLOCK_SIZE; itr != bytes.end(); ++itr) {

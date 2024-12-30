@@ -37,9 +37,9 @@ namespace Archive {
 		AES::IV m_aes_iv;
 		AES::Manager m_aes_manager;
 
-		Blob Encrypt(FilePathView before) const;
+		Blob Encrypt(const Blob& plain) const;
 
-		Blob Decrypt(const Array<Byte>& bytes) const;
+		Blob Decrypt(const Blob& encrypt) const;
 
 		AES::IV GenerateIV() const;
 	};
