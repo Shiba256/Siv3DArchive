@@ -1,6 +1,8 @@
 ﻿#pragma once
+
 #include"AES.h"
 
+#include"stdafx.h"
 namespace AES {
 	class Key;
 	enum class Mode;
