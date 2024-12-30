@@ -20,5 +20,7 @@ namespace Archive {
 	/// @param mode AES暗号のモード
 	void Setting(FilePathView path, AES::Key key, AES::Mode mode = AES::Mode::CTR);
 
+	/// @brief アーカイブに含まれるファイルパスを全て返します
+	/// @return アーカイブに含まれるファイルパス
 	Array<FilePath> GetContents();
 }
