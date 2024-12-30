@@ -74,10 +74,10 @@ namespace AES {
 		bool isEmpty() const noexcept;
 
 		[[nodiscard]]
-		size_t size() const noexcept;
+		constexpr size_t size() const noexcept;
 
 		[[nodiscard]]
-		size_t size_bytes() const noexcept;
+		constexpr size_t size_bytes() const noexcept;
 
 		[[nodiscard]]
 		size_t max_size() const noexcept;

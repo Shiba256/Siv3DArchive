@@ -29,11 +29,11 @@
 		return m_data.empty();
 	}
 
-	inline size_t Key::size() const noexcept {
+	inline constexpr size_t Key::size() const noexcept {
 		return m_data.size();
 	}
 
-	inline size_t Key::size_bytes() const noexcept {
+	inline constexpr size_t Key::size_bytes() const noexcept {
 		return sizeof(m_data);
 	}
 
