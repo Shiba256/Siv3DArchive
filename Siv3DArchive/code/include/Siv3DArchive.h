@@ -19,4 +19,6 @@ namespace Archive {
 	/// @param key アーカイブファイルの暗号鍵
 	/// @param mode AES暗号のモード
 	void Setting(FilePathView path, AES::Key key, AES::Mode mode = AES::Mode::CTR);
+
+	Array<FilePath> GetContents();
 }

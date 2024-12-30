@@ -10,12 +10,12 @@ void Main() {
 
 	// engine ディレクトリのアーカイブを作成
 	Archive::Create(U"engine");
-
+	
 	// アーカイブファイルから読み込む
 	// アーカイブのパス及び鍵は Archive::Setting で指定したものが使われる
 	TextReader reader{ Archive::Load(U"engine/font/fontawesome/LICENSE.txt") };
 
 	Console << reader.readAll();
-
+	
 	while (System::Update()) {}
 }

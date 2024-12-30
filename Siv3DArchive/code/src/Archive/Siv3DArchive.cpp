@@ -30,6 +30,16 @@ namespace Archive {
 			return MemoryReader{};
 		}
 	}
+
+	Array<FilePath> GetContents() {
+		if (p_impl) {
+			if (not p_impl->isRead()) {
+				p_impl->ReadHeader();
+			}
+			return p_impl->GetContents();
+		}
+		return {};
+	}
 }
 
 

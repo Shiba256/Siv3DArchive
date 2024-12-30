@@ -21,13 +21,18 @@ namespace Archive {
 
 		void setArchivePath(FilePathView path);
 
-		constexpr bool isRead() const noexcept {
-			return static_cast<bool>(m_header_size);
+		bool isRead() const noexcept;
+
+		Array<FilePath> GetContents() const {
+			Array<FilePath> contents;
+			for (const auto& content : m_data) {
+				contents << content.first;
+			}
+			return contents;
 		}
 	private:
 		HashTable<FilePath, std::pair<size_t, size_t>> m_data;
-		size_t m_header_size = 0ull;
-		FilePathView m_archive_path = U"";
+		FilePathView m_archive_path;
 		AES::Key m_aes_key;
 		AES::IV m_aes_iv;
 		AES::Manager m_aes_manager;
