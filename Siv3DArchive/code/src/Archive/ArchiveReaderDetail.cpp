@@ -1,7 +1,7 @@
 ﻿#include"ArchiveReaderDetail.h"
 
 namespace s3a {
-	constexpr size_t META_DATA_SIZE{ 2 * sizeof(size_t) + 16ull };
+	constexpr size_t META_DATA_SIZE{ 2 * sizeof(size_t) + AES::BLOCK_SIZE };
 
 	ArchiveReader::ArchiveReaderDetail::ArchiveReaderDetail(FilePathView archive_path, AES::Key key, AES::Mode mode) :
 		m_archive_path(archive_path),
