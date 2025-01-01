@@ -1,5 +1,5 @@
-﻿#include"AES.h"
-#include"AESDetail.h"
+﻿#include "AES.h"
+#include "AESDetail.h"
 
 namespace AES {
 	Manager::Manager(const Key& key, Mode mode)
@@ -21,11 +21,24 @@ namespace AES {
 			size_t blockSize = std::min<size_t>(16, padding_plainText.size() - i);
 			std::memcpy(block, padding_plainText.data() + i, blockSize);
 
-			if (m_mode == Mode::CBC) {
+			if (m_mode == Mode::ECB) {
+				p_impl->encryptBlock(block);
+			}
+			else if (m_mode == Mode::CBC) {
 				for (size_t j = 0; j < 16; ++j) {
 					block[j] ^= static_cast<uint8>(workingIV[j]);
 				}
 				p_impl->encryptBlock(block);
+				std::memcpy(workingIV.data(), block, 16);
+			}
+			else if (m_mode == Mode::CFB) {
+				uint8 temp[16];
+				std::memcpy(temp, workingIV.data(), 16);
+				p_impl->encryptBlock(temp);
+
+				for (size_t j = 0; j < 16; ++j) {
+					block[j] ^= temp[j];
+				}
 				std::memcpy(workingIV.data(), block, 16);
 			}
 			else if (m_mode == Mode::CTR) {
@@ -57,7 +70,10 @@ namespace AES {
 			uint8 block[16];
 			std::memcpy(block, cipherText.data() + i, 16);
 
-			if (m_mode == Mode::CBC) {
+			if (m_mode == Mode::ECB) {
+				p_impl->decryptBlock(block);
+			}
+			else if (m_mode == Mode::CBC) {
 				uint8 prevIV[16];
 				std::memcpy(prevIV, workingIV.data(), 16);
 				p_impl->decryptBlock(block);
@@ -66,6 +82,16 @@ namespace AES {
 					block[j] ^= prevIV[j];
 				}
 
+				std::memcpy(workingIV.data(), cipherText.data() + i, 16);
+			}
+			else if (m_mode == Mode::CFB) {
+				uint8 temp[16];
+				std::memcpy(temp, workingIV.data(), 16);
+				p_impl->encryptBlock(temp);
+
+				for (size_t j = 0; j < 16; ++j) {
+					block[j] ^= temp[j];
+				}
 				std::memcpy(workingIV.data(), cipherText.data() + i, 16);
 			}
 			else if (m_mode == Mode::CTR) {
@@ -85,6 +111,7 @@ namespace AES {
 
 			std::memcpy(plainText.data() + i, block, 16);
 		}
+
 		auto plainArray = plainText.asArray();
 		if (!plainText.empty()) {
 			uint8_t paddingValue = AsUint8(plainArray.back());

@@ -2,7 +2,9 @@
 
 namespace AES {
 	enum class Mode {
+		ECB,
 		CBC,
-		CTR,
+		CFB,
+		CTR
 	};
 }

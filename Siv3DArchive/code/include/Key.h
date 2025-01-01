@@ -130,6 +130,30 @@ namespace AES {
 
 		static Key GenerateRandomKey();
 
+		static Key FromBase64Str(const String& str) {
+			const auto blob = Base64::Decode(str);
+			Key key{};
+			if (blob.size() != AES::KEY_SIZE) {
+				throw Error{ U"Failed Parse String to AES::Key\nThe Key size is assumed to be 16 bytes" };
+			}
+			for (auto i : step(16ull)) {
+				key[i] = blob[i];
+			}
+			return key;
+		}
+
+		static Key FromBase64(const std::string& str){
+			const auto blob = Base64::Decode(str);
+			Key key{};
+			if (blob.size() != AES::KEY_SIZE) {
+				throw Error{ U"Failed Parse String to AES::Key\nThe Key size is assumed to be 16 bytes" };
+			}
+			for (auto i : step(16ull)) {
+				key[i] = blob[i];
+			}
+			return key;
+		}
+
 	private:
 		base_type m_data;
 	};

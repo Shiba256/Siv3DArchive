@@ -3,10 +3,14 @@
 
 void Main() {
 	// 鍵の生成
-	const auto key = AES::Key::GenerateRandomKey();
+	const String key_str = AES::Key::GenerateRandomKey().base64Str();
+
+	Console << U"key " << key_str;
+
+	const AES::Key key = AES::Key::FromBase64Str(key_str);
 
 	// アーカイブの入出力先と鍵を設定
-	Archive::Setting(U"archive.cmp", key);
+	Archive::Setting(U"archive.cmp", key, AES::Mode::CFB);
 
 	// engine ディレクトリのアーカイブを作成
 	Archive::Create(U"engine");
