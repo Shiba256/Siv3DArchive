@@ -11,7 +11,7 @@ namespace s3a {
 	ArchiveReader::ArchiveReader(FilePathView archive_path, AES::Key key, AES::Mode mode) :
 		p_impl(std::make_shared<ArchiveReaderDetail>(archive_path, key, mode))
 	{
-		p_impl->ReadHeader();
+		if (p_impl)p_impl->ReadHeader();
 	}
 
 	MemoryReader ArchiveReader::load(FilePathView path) {
@@ -33,6 +33,7 @@ namespace s3a {
 	bool ArchiveReader::open(FilePathView archive_path, AES::Key key, AES::Mode mode) {
 		if (p_impl)p_impl.reset();
 		p_impl = std::make_shared<ArchiveReaderDetail>(archive_path, key, mode);
+		if (p_impl)p_impl->ReadHeader();
 		return p_impl->isOpen();
 	}
 
