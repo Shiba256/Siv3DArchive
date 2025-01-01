@@ -165,10 +165,13 @@
     <ClCompile Include="code\src\AES\Key.cpp">
       <Filter>Source Files\AES</Filter>
     </ClCompile>
-    <ClCompile Include="code\src\Archive\ArchiveDetail.cpp">
+    <ClCompile Include="code\src\Archive\ArchiveWriterDetail.cpp">
       <Filter>Source Files\Archive</Filter>
     </ClCompile>
     <ClCompile Include="code\src\Archive\Siv3DArchive.cpp">
+      <Filter>Source Files\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Archive\ArchiveReaderDetail.cpp">
       <Filter>Source Files\Archive</Filter>
     </ClCompile>
   </ItemGroup>
@@ -845,7 +848,7 @@
     <ClInclude Include="code\src\AES\AESDetail.h">
       <Filter>Source Files\AES</Filter>
     </ClInclude>
-    <ClInclude Include="code\src\Archive\ArchiveDetail.h">
+    <ClInclude Include="code\src\Archive\ArchiveWriterDetail.h">
       <Filter>Source Files\Archive</Filter>
     </ClInclude>
     <ClInclude Include="code\include\ipp\Key.ipp">
@@ -862,6 +865,9 @@
     </ClInclude>
     <ClInclude Include="code\include\constants.h">
       <Filter>Header Files\AES</Filter>
+    </ClInclude>
+    <ClInclude Include="code\src\Archive\ArchiveReaderDetail.h">
+      <Filter>Source Files\Archive</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

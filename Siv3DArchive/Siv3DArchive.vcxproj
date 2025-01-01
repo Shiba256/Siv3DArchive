@@ -120,7 +120,8 @@
     <ClCompile Include="code\src\AES\AES.cpp" />
     <ClCompile Include="code\src\AES\AESDetail.cpp" />
     <ClCompile Include="code\src\AES\Key.cpp" />
-    <ClCompile Include="code\src\Archive\ArchiveDetail.cpp" />
+    <ClCompile Include="code\src\Archive\ArchiveWriterDetail.cpp" />
+    <ClCompile Include="code\src\Archive\ArchiveReaderDetail.cpp" />
     <ClCompile Include="code\src\Archive\Siv3DArchive.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -340,7 +341,8 @@
     <ClInclude Include="code\include\Mode.h" />
     <ClInclude Include="code\include\Siv3DArchive.h" />
     <ClInclude Include="code\src\AES\AESDetail.h" />
-    <ClInclude Include="code\src\Archive\ArchiveDetail.h" />
+    <ClInclude Include="code\src\Archive\ArchiveWriterDetail.h" />
+    <ClInclude Include="code\src\Archive\ArchiveReaderDetail.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
