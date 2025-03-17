@@ -115,6 +115,11 @@ namespace AES {
 		auto plainArray = plainText.asArray();
 		if (!plainText.empty()) {
 			uint8_t paddingValue = AsUint8(plainArray.back());
+			for (size_t i = 0ull; i < paddingValue; i++) {
+				if (AsUint8(plainArray[plainArray.size() - 1ull - i]) != paddingValue) {
+					paddingValue = 0ull;
+				}
+			}
 			if (0 < paddingValue && paddingValue <= 16) {
 				plainArray.resize(plainArray.size() - paddingValue);
 			}
